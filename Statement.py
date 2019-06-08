@@ -34,6 +34,9 @@ class Statement:
             if self.startDate.month == 12:
                 newMonth = 1
                 newYear = self.startDate.year + 1
+            elif self.startDate.day == 1:
+                newMonth = self.startDate.month
+                newYear = self.startDate.year
             else:
                 newMonth = self.startDate.month + 1
                 newYear = self.startDate.year
@@ -135,6 +138,12 @@ class Statement:
             if i not in previouslyListedTransactions:
                 otherTransactions.append(i)
         return otherTransactions
+
+    def addExpenditure(self, transaction):
+        self.expenditureTransactions.append(transaction)
+
+    def addIncome(self, transaction):
+        self.incomeTransactions.append(transaction)
 
     def agentFeesToString(self):
         l = self.getAgentFeeExpenses()

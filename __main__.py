@@ -40,14 +40,14 @@ def writeTransactionRow(ws, s, rowNum):
 
 def writeTotalRow(ws, year):
     # wb[Houses[house]].append()
-    ws.cell(row=15, column=1).value = "TOTAL: "
-    ws.cell(row=15, column=2).value = year.totalGrossIncome()
-    ws.cell(row=15, column=3).value = year.totalAgentFees()
-    ws.cell(row=15, column=4).value = year.totalGardeningFees()
-    ws.cell(row=15, column=5).value = year.totalOtherExpenditure()
-    ws.cell(row=15, column=6).value = year.totalGrossExpenditure()
-    ws.cell(row=15, column=7).value = year.totalRetained()
-    ws.cell(row=15, column=8).value = year.totalGrossProfit()
+    ws.cell(row=16, column=1).value = "TOTAL: "
+    ws.cell(row=16, column=2).value = year.totalGrossIncome()
+    ws.cell(row=16, column=3).value = year.totalAgentFees()
+    ws.cell(row=16, column=4).value = year.totalGardeningFees()
+    ws.cell(row=16, column=5).value = year.totalOtherExpenditure()
+    ws.cell(row=16, column=6).value = year.totalGrossExpenditure()
+    ws.cell(row=16, column=7).value = year.totalRetained()
+    ws.cell(row=16, column=8).value = year.totalGrossProfit()
 
 
 def assignStatementToHouse(Houses, statements):

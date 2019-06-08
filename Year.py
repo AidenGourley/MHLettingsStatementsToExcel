@@ -1,6 +1,7 @@
 import fiscalyear
 fiscalyear.START_DAY = 6
 fiscalyear.START_MONTH = 4
+from datetime import timedelta
 
 
 class Year:
@@ -19,8 +20,27 @@ class Year:
         return self.__statements
 
     def addStatement(self, statement):
-        self.__statements.append(statement)
-        self.__statements.sort(key=lambda s: s.startDate)
+        if self.validateStatement(statement):
+            self.__statements.append(statement)
+            self.__statements.sort(key=lambda s: s.startDate)
+
+    def validateStatement(self, newStatement):
+        valid = True
+        for statement in self.__statements:
+            if statement.startDate == newStatement.startDate:
+                valid = False
+            elif statement.startDate == newStatement.startDate + timedelta(days=1):
+                valid = False
+            elif statement.endDate == newStatement.endDate:
+                valid = False
+            ################ IF DUPLICATE FOUND, ADD TRANSACTIONS ON##################
+            #if not valid:
+            #    for transaction in newStatement.expenditureTransactions:
+            #        statement.addExpenditure(transaction)
+            #    for transaction in newStatement.incomeTransactions:
+            #        statement.addIncome(transaction)
+
+        return valid
 
     def removeStatement(self, statementStartDate):
         for statement in self.__statements:
