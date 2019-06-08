@@ -10,6 +10,16 @@ import Statement
 import Transaction
 
 
+def assignStatementToHouse(Houses, house, statements):
+    for statement in statements:
+        year = statement.endDate.fiscal_year
+        if year in Houses[house]:
+            Houses[house][year].append(statement)
+        else:
+            Houses[house][year] = [statement]
+    return Houses
+
+
 def getFiscalMonth(statement):
     return ((statement.startDate.month - 4) % 12) + 1
 
@@ -22,8 +32,9 @@ def splitDate(startDate, endDate):
     return endStatementStartDate, endStatementEndDate, startStatementStartDate, startStatementEndDate
 
 
-def splitStatement(statement, Houses):
+def splitStatement(statement):
     # Split the statements and assign new dates first.
+
     endStatement, startStatement = Statement.Statement(), Statement.Statement()
     endStatement.address, startStatement.address = statement.address, statement.address
     endStatement.startDate, endStatement.endDate, startStatement.startDate, startStatement.endDate = splitDate(
@@ -37,6 +48,9 @@ def splitStatement(statement, Houses):
         "%d/%m/%Y") + " to " + startStatement.endDate.strftime("%d/%m/%Y")
     endStatement.dateString = endStatement.startDate.strftime("%d/%m/%Y") + " to " + endStatement.endDate.strftime(
         "%d/%m/%Y")
+    print("---------------------------------------------")
+    print(endStatement.startDate, " - ", endStatement.endDate)
+    print(startStatement.startDate, " - ", startStatement.endDate)
 
     # Remove retained transaction from the endStatement, and keeps it in the startStatement
     for transaction in statement.incomeTransactions:
@@ -53,9 +67,15 @@ def splitStatement(statement, Houses):
                     differenceBetweenDates - daysUntilNewFiscalYear), 2)
             startVAT = round(
                 (transaction.VAT / differenceBetweenDates) * (differenceBetweenDates - daysUntilNewFiscalYear), 2)
-            splitEndTransaction = Transaction.Transaction(transaction.name, endNet, endVAT, endGross, transaction.date)
-            splitStartTransaction = Transaction.Transaction(transaction.name, startNet, startVAT, startGross,
+            try:
+                splitEndTransaction = Transaction.Transaction(transaction.name, endNet, endVAT, endGross, transaction.date)
+                splitStartTransaction = Transaction.Transaction(transaction.name, startNet, startVAT, startGross,
                                                             transaction.date)
+            except AttributeError:
+                splitEndTransaction = Transaction.Transaction(transaction.name, endNet, endVAT, endGross,
+                                                              None)
+                splitStartTransaction = Transaction.Transaction(transaction.name, startNet, startVAT, startGross,
+                                                                None)
             endStatement.incomeTransactions.append(splitEndTransaction)
             startStatement.incomeTransactions.append(splitStartTransaction)
 
@@ -64,17 +84,7 @@ def splitStatement(statement, Houses):
 
     endStatement.number, startStatement.number = statement.number
 
-    if endStatement.endDate.fiscal_year in Houses[house]:  # If the Year record exists then...
-        Houses[house][endStatement.endDate.fiscal_year].append(endStatement)
-    else:  # Otherwise create a record for a new year...
-        Houses[house][endStatement.endDate.fiscal_year] = [endStatement]
-
-    if startStatement.endDate.year in Houses[house]:
-        Houses[house][startStatement.endDate.fiscal_year].append(startStatement)
-    else:
-        Houses[house][startStatement.endDate.fiscal_year] = [startStatement]
-
-    return Houses
+    return startStatement, endStatement
 
 
 Houses = {"RG45 6RY": {}, "RG45 6JS": {}}
@@ -91,14 +101,17 @@ for filename in os.listdir("./testFiles/"):
         statement = Statement.Statement(stringFromPDF)
         for house in Houses:  # for each house
             if house in statement.address:  # if the statement is for this house then...
-                if statement.startDate.fiscal_year != statement.endDate.fiscal_year:  # if the month is april then.. Split the Statement
-                    Houses = splitStatement(statement, Houses)
+                #startOfFiscalYear = fiscalyear.FiscalDate(statement.endDate.fiscal_year, 4, 6)
+                startOfMonthFiscalYear = statement.startDate.fiscal_year
+                endOfMonthFiscalYear = statement.endDate.fiscal_year
+                if startOfMonthFiscalYear != endOfMonthFiscalYear:
+                   # if statement.startDate.month < 3 or statement.startDate.month > 5:
+                #if statement.startDate.fiscal_year != statement.endDate.fiscal_year:  # if the month is april then.. Split the Statement
+                    statement1, statement2 = splitStatement(statement)
+                    Houses = assignStatementToHouse(Houses, house, [statement1, statement2])
                     break
                 else:
-                    if statement.endDate.fiscal_year in Houses[house]:  # If the Year record exists then...
-                        Houses[house][statement.endDate.fiscal_year].append(statement)
-                    else:  # Otherwise create a record for a new year...
-                        Houses[house][statement.endDate.fiscal_year] = [statement]
+                    Houses = assignStatementToHouse(Houses, house, [statement])
 
 for house in Houses:
     for year in Houses[house]:
@@ -171,6 +184,7 @@ for house in Houses:
             print(s.startDate, " - ", s.endDate)
 
             wb.save(wbName)
+
 
 cprint("Spreadsheet Build Success!", "green")
 input()

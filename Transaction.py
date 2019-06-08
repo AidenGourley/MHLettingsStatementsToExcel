@@ -12,4 +12,4 @@ class Transaction:
         try:
             self.date = fiscalyear.FiscalDate(int(date[6:10]), int(date[3:5]), int(date[:2]))
         except:
-            self.date = date
+            None

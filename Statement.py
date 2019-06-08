@@ -91,14 +91,16 @@ class Statement:
         string = self.getStatementStartDate(segment).strftime("%d/%m/%Y") + " to " + self.endDate.strftime("%d/%m/%Y")
         return string
 
-    def getStatementStartDate(self, segment):
+    def getStatementStartDate(self, segment): #Returns FiscalDate Obj
         for i in self.incomeTransactions:
-            if ("Rent-" in i.name) or ("Rent -" in i.name):
+            if (("Rent-" in i.name) or ("Rent -" in i.name)) and i.date:
                 return i.date
             else:
                 try:
-                    if "Rent " + datetime.strftime(i.date, "%d/%m/%Y") in i.name:
+                    if ("Rent " + datetime.strftime(i.date, "%d/%m/%Y") in i.name) and i.date:
                         return i.date
+                    else:
+                        continue
                 except:
                     continue
         # Else
