@@ -1,4 +1,6 @@
 import fiscalyear
+fiscalyear.START_DAY = 6
+fiscalyear.START_MONTH = 4
 
 
 class Transaction:

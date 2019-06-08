@@ -2,6 +2,8 @@ from calendar import monthrange
 from datetime import datetime
 
 import fiscalyear
+fiscalyear.START_DAY = 6
+fiscalyear.START_MONTH = 4
 from termcolor import cprint
 
 import Scraper
