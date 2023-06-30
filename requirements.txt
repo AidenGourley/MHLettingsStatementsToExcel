@@ -2,5 +2,5 @@ fiscalyear==0.1.0
 jdcal==1.4.1
 lxml==4.3.3
 openpyxl==2.6.2
-PyPDF2==1.26.0
+PyPDF2==1.27.9
 termcolor==1.1.0
